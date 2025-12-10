@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>⚽ Neon Football Hangman</title>
+<title>⚽ Football Hangman</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
@@ -127,10 +127,29 @@
     color: #1b1b1b;
     cursor: pointer;
     box-shadow: 0 0 8px #ffd16666;
+    margin-right: 8px;
   }
 
   #hintBtn:disabled {
     background: #bfbfbf;
+    cursor: default;
+    box-shadow: none;
+  }
+
+  #playBtn {
+    margin-top: 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #6be56b;
+    border: none;
+    font-weight: 600;
+    color: #072;
+    cursor: pointer;
+    box-shadow: 0 0 8px #6be56b55;
+  }
+
+  #playBtn:disabled {
+    background: #9fd79f;
     cursor: default;
     box-shadow: none;
   }
@@ -158,18 +177,35 @@
   <div id="lives"></div>
   <div id="message" role="status" aria-live="polite"></div>
   <div id="letters" role="group" aria-label="letters"></div>
-  <button id="hintBtn">Show Hint</button>
+
+  <div>
+    <button id="hintBtn">Show Hint</button>
+    <button id="playBtn">Play Again</button>
+  </div>
+
   <div id="hint"></div>
   <div id="footer">Hint shows automatically when you are low on lives.</div>
 </div>
 
 <script>
 /*
-  Updated word list: cleaned to remove obscure/misspelled entries and duplicates.
-  Hints object provides a short hint per player (key must match the list entry).
+  Updated:
+  - Added Play Again button to reset the game state.
+  - Reset re-selects a word, clears guesses, re-enables letter buttons and hint button,
+    and resets lives/display/message/hint.
 */
 
 const wordList = [
+  // Young & rising stars (added)
+  'pablo gavi',
+  'endrick felipe',
+  'rayan cherki',
+  'nico williams',
+  'jarell quansah',
+  'fabio miretti',
+  'alejandro garnacho',
+
+  // Established & well-known players
   'kylian mbappe',
   'erling haaland',
   'bukayo saka',
@@ -249,8 +285,18 @@ const wordList = [
   'mike maignan'
 ];
 
-// Short hints for players. Keep keys identical to wordList entries.
+// Short hints for players. Keys must exactly match strings from wordList.
 const hints = {
+  // Newly added young stars
+  'pablo gavi': 'Spanish midfielder, Barcelona — tenacious, great tackling and passing range.',
+  'endrick felipe': 'Brazilian forward (young prodigy) — highly-rated striker with strong finishing.',
+  'rayan cherki': 'French attacker — dribbling talent and flair for Lyon (or current club).',
+  'nico williams': 'Spanish winger — explosive and direct, creates chances from wide areas.',
+  'jarell quansah': 'English centre-back — youthful defender strong in duels.',
+  'fabio miretti': 'Italian midfielder — promising young playmaker with good technique.',
+  'alejandro garnacho': 'Argentinian/Spanish winger — quick, tricky and good in front of goal.',
+
+  // Existing hints (kept/adjusted)
   'kylian mbappe': 'French forward, PSG — explosive pace and clinical finishing.',
   'erling haaland': 'Norwegian striker, Manchester City — prolific power & finishing.',
   'bukayo saka': 'English winger, Arsenal — versatile attacker and set-piece taker.',
@@ -321,6 +367,7 @@ const hints = {
   'ederson': 'Brazilian goalkeeper — superb passer and distribution.',
   'rodri': 'Spanish holding midfielder — stabiliser and strong in control.',
   'paulo dybala': 'Argentine attacker — skilful and creative forward.',
+  'dusan vlahovic': 'Serbian striker — powerful target man with finishing.',
   'federico chiesa': 'Italian winger/forward — energetic and tenacious attacker.',
   'nicolo barella': 'Italian midfielder — energetic box-to-box contributor.',
   'milan skriniar': 'Slovak centre-back — solid and reliable defender.',
@@ -381,9 +428,9 @@ const stages = [
 =========`
 ];
 
-let chosenWord = wordList[Math.floor(Math.random() * wordList.length)];
-let display = chosenWord.split('').map(ch => ch === ' ' ? ' ' : '_');
-let lives = 6;
+let chosenWord;
+let display;
+let lives;
 let guessedLetters = [];
 let hintShown = false;
 
@@ -394,6 +441,27 @@ const messageDiv = document.getElementById('message');
 const lettersDiv = document.getElementById('letters');
 const hintBtn = document.getElementById('hintBtn');
 const hintDiv = document.getElementById('hint');
+const playBtn = document.getElementById('playBtn');
+
+function pickWord() {
+  return wordList[Math.floor(Math.random() * wordList.length)];
+}
+
+function initGame() {
+  chosenWord = pickWord();
+  display = chosenWord.split('').map(ch => ch === ' ' ? ' ' : '_');
+  lives = 6;
+  guessedLetters = [];
+  hintShown = false;
+  hintDiv.textContent = '';
+  hintBtn.disabled = false;
+  messageDiv.textContent = '';
+  enableAllLetterButtons();
+  updateDisplay();
+
+  // Uncomment to see the chosen word for debugging:
+  // console.log('Chosen player:', chosenWord);
+}
 
 function updateDisplay() {
   wordDisplay.innerHTML = '';
@@ -408,7 +476,6 @@ function updateDisplay() {
     }
     wordDisplay.appendChild(slot);
   });
-  // Use lives as index: 6 = empty, 0 = full hangman
   stagesDiv.textContent = stages[lives];
   livesDiv.textContent = `Lives: ${lives}/6`;
 }
@@ -422,6 +489,7 @@ function revealHint() {
 }
 
 hintBtn.addEventListener('click', revealHint);
+playBtn.addEventListener('click', resetGame);
 
 function checkLetter(letter) {
   if (guessedLetters.includes(letter)) {
@@ -464,6 +532,12 @@ function disableLetters() {
   hintBtn.disabled = true;
 }
 
+function enableAllLetterButtons() {
+  document.querySelectorAll('button.letter').forEach(btn => {
+    btn.disabled = false;
+  });
+}
+
 function createLetterButtons() {
   const alphabet = 'abcdefghijklmnopqrstuvwxyz';
   alphabet.split('').forEach(letter => {
@@ -475,8 +549,14 @@ function createLetterButtons() {
   });
 }
 
+function resetGame() {
+  // Re-enable buttons and re-init game state
+  enableAllLetterButtons();
+  initGame();
+}
+
 createLetterButtons();
-updateDisplay();
+initGame();
 
 // For debugging you can uncomment the line below to see the chosen word in console
 // console.log('Chosen player:', chosenWord);
