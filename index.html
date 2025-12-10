@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>⚽ Football Hangman</title>
+<title>⚽ Neon Football Hangman</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
@@ -337,42 +337,39 @@ const hints = {
   "roberto carlos": "Brazilian full-back — legendary for a bending outside-the-boot free-kick and fearless overlapping runs.",
   "ronaldinho gaucho": "Brazilian showman — magician of tricks and flair whose smile lit up stadiums worldwide.",
   "ronaldo nazario": "Brazilian ‘El Fenómeno’ — pure striker instinct and explosive pace at his prime made defenders tremble.",
-  "sandro tonali": "Italian midfielder — classic regista now plying his trade in England, dictating play with composure.",
-  "sergio ramos": "Spanish defender — warrior centre-back famous for clutch headers and fiery temperament.",
-  "theo hernandez": "French full-back — explosive left-back bursting forward on AC Milan’s flanks with blistering runs.",
-  "thierry henry": "French forward — elegant finisher who defined a generation with pace and composure on the left.",
-  "trent alexander-arnold": "English right-back — world-class passer from deep, now featuring in Madrid’s defensive rebuild.",
-  "victor osimhen": "Nigerian striker — soaring attacker known for aerial power and physical presence in Napoli’s front-line.",
-  "vinicius junior": "Brazilian winger — dazzling dribbler and pace merchant consistently terrorizing defences in white.",
-  "virgil van dijk": "Dutch centre-back — commanding defender famous for calm dominance and perfect timing.",
-  "xavi hernandez": "Spanish midfield master turned manager — still obsessed with ball-control and tactical triangles.",
-  "xavi simons": "Dutch attacking midfielder — creative spark recently transplanted to England, dangerous between the lines.",
-  "zinedine zidane": "French legend — midfield elegance remembered for lethal volleys and tactical brilliance."
-  "johan bakayoko":  "Belgian winger/forward — pacey attacker now challenging defenders in Germany’s top flight after a big summer move.",
-  "joao neves":      "Portuguese midfield prodigy — midfield dynamo at a major French club, already earning caps for his national team.",
-  "noni madueke":    "English winger — energetic wide‑man now plying his trade in London’s senior top‑flight, dangerous on the break.",
-  "eberechi eze":    "English attacking midfielder — skilful creator recently returning to his boyhood London club’s first team.",
+  "sandro tonali":"Italian midfielder — classic regista now plying his trade in England, dictating play with composure.",
+  "sergio ramos":"Spanish defender — warrior centre-back famous for clutch headers and fiery temperament.",
+  "theo hernandez":"French full-back — explosive left-back bursting forward on AC Milan’s flanks with blistering runs.",
+  "thierry henry":"French forward — elegant finisher who defined a generation with pace and composure on the left.",
+  "trent alexander-arnold":"English right-back — world-class passer from deep, now featuring in Madrid’s defensive rebuild.",
+  "victor osimhen":"Nigerian striker — soaring attacker known for aerial power and physical presence in Napoli’s front-line.",
+  "vinicius junior":"Brazilian winger — dazzling dribbler and pace merchant consistently terrorizing defences in white.",
+  "virgil van dijk":"Dutch centre-back — commanding defender famous for calm dominance and perfect timing.",
+  "xavi hernandez":"Spanish midfield master turned manager — still obsessed with ball-control and tactical triangles.",
+  "xavi simons":"Dutch attacking midfielder — creative spark recently transplanted to England, dangerous between the lines.",
+  "zinedine zidane":"French legend — midfield elegance remembered for lethal volleys and tactical brilliance."
+  "johan bakayoko":"Belgian winger/forward — pacey attacker now challenging defenders in Germany’s top flight after a big summer move.",
+  "joao neves":"Portuguese midfield prodigy — midfield dynamo at a major French club, already earning caps for his national team.",
+  "noni madueke":"English winger — energetic wide‑man now plying his trade in London’s senior top‑flight, dangerous on the break.",
+  "eberechi eze":"English attacking midfielder — skilful creator recently returning to his boyhood London club’s first team.",
   "warren zaïre-emery": "French central midfield youngster — controlling play with maturity beyond his years at a big European club.",
-  "mathys tel":      "French forward — young striker breaking into the senior squad of a top European side, known for bursts of speed.",
+  "mathys tel":"French forward — young striker breaking into the senior squad of a top European side, known for bursts of speed.",
   "miles lewis-skelly": "English defender/wing‑back — promising young talent at a top English club, beginning to show up in first-team squads.",
-  "estevao willian":   "Brazilian forward — flair‑filled attacker, now trying to impress in Europe’s senior competitions.",  
-  "benjamin šoško":       "Slovenian striker — tall, powerful forward breaking through in Germany with real physical presence.",  
-  "jamal musiala":        "German attacker/midfielder — dribbling wizard combining youth and elite‑level calm.",  
-  "ar​da guler":           "Turkish‑born forward/midfielder — young spark in a top Spanish side, offering dribbling and vision.",  
-  "miles lewis‑skelly":   "English left‑back/wing‑back — breakout youngster showing up in senior match‑day squads, catching eyes.",  
-  "kendrey paez":         "Ecuadorian winger/forward — young, quick attacker already appearing in first-team lineups in 2025.",  
-  "kobbie mainoo":        "English midfield diamond — energetic, creative box‑to‑box talent breaking through in top flight.",  
-  "rico lewis":           "English defender/wing‑back — versatile young talent combining defensive solidity with attacking runs.",  
-  "pablo c﻿ubarsí":       "Spanish centre‑back — young defender at a top club, blending composure with potential.",  
-  "dean huijsen":         "Dutch‑Spanish centre‑back — tall, commanding defender breaking through in senior football in 2025.",  
-  "pau cubarsi":          "Spanish defender — emerging youth‑to‑senior transition player breaking into top‑tier defense.",  
-  "jobe bellingham":  "English midfield‑engine — 19‑year‑old now wearing black & yellow, already proving himself in Bundesliga midfield battles.",
-  "senny mayulu":     "French young midfielder — rising talent reportedly in senior rotation for a top French club, eyes on the future.",
+  "estevao willian":"Brazilian forward — flair‑filled attacker, now trying to impress in Europe’s senior competitions.",  
+  "benjamin šoško":"Slovenian striker — tall, powerful forward breaking through in Germany with real physical presence.",  
+  "jamal musiala":"German attacker/midfielder — dribbling wizard combining youth and elite‑level calm.",  
+  "ar​da guler":"Turkish‑born forward/midfielder — young spark in a top Spanish side, offering dribbling and vision.",  
+  "miles lewis‑skelly":"English left‑back/wing‑back — breakout youngster showing up in senior match‑day squads, catching eyes.",  
+  "kendrey paez":"Ecuadorian winger/forward — young, quick attacker already appearing in first-team lineups in 2025.",  
+  "kobbie mainoo":"English midfield diamond — energetic, creative box‑to‑box talent breaking through in top flight.",  
+  "rico lewis":"English defender/wing‑back — versatile young talent combining defensive solidity with attacking runs.",  
+  "pablo c﻿ubarsí":"Spanish centre‑back — young defender at a top club, blending composure with potential.",  
+  "dean huijsen":"Dutch‑Spanish centre‑back — tall, commanding defender breaking through in senior football in 2025.",  
+  "pau cubarsi":"Spanish defender — emerging youth‑to‑senior transition player breaking into top‑tier defense.",  
+  "jobe bellingham":"English midfield‑engine — 19‑year‑old now wearing black & yellow, already proving himself in Bundesliga midfield battles.",
+  "senny mayulu":"French young midfielder — rising talent reportedly in senior rotation for a top French club, eyes on the future.",
 };
-
-
-
-
+  
 const stages = [
 `  +---+
   |   |
@@ -536,7 +533,7 @@ function enableAllLetterButtons() {
 }
 
 function createLetterButtons() {
-  const alphabet = 'abcdefghijklmnopqrstuvwxyz-';
+  const alphabet = 'abcdefghijklmnopqrstuvwxyz';
   alphabet.split('').forEach(letter => {
     const btn = document.createElement('button');
     btn.textContent = letter;
