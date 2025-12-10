@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚽ Neon Football Hangman</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: radial-gradient(circle at top, #0a0f24, #1a1f3c);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  #gameContainer {
+    background: rgba(255,255,255,0.05);
+    padding: 30px 40px;
+    border-radius: 25px;
+    max-width: 700px;
+    width: 90%;
+    box-shadow: 0 0 50px #00d4ff66;
+    text-align: center;
+    backdrop-filter: blur(10px);
+  }
+
+  h1 {
+    color: #00d4ff;
+    font-size: 2.2em;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px #00d4ff, 0 0 20px #00d4ff66;
+  }
+
+  #stages {
+    font-family: monospace;
+    font-size: 1.2em;
+    white-space: pre;
+    margin-bottom: 20px;
+    line-height: 1.2em;
+    color: #00ffe1;
+    text-shadow: 0 0 5px #00ffe1;
+  }
+
+  #wordDisplay {
+    font-size: 2em;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .letter-slot {
+    display: inline-block;
+    width: 30px;
+    margin: 0 5px;
+    border-bottom: 3px solid #00d4ff;
+    text-transform: uppercase;
+    font-weight: bold;
+    transition: all 0.2s;
+  }
+
+  .space-slot {
+    width: 20px;
+    margin: 0 5px;
+  }
+
+  #lives {
+    font-size: 1.2em;
+    margin-bottom: 15px;
+    color: #ff6b6b;
+    text-shadow: 0 0 5px #ff6b6b;
+  }
+
+  #message {
+    font-weight: bold;
+    margin-bottom: 20px;
+    font-size: 1.2em;
+    min-height: 1.5em;
+    color: #fff200;
+    text-shadow: 0 0 5px #fff200;
+  }
+
+  #letters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  button.letter {
+    margin: 5px;
+    padding: 10px 15px;
+    border-radius: 10px;
+    background: #00d4ff;
+    border: none;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+    text-transform: uppercase;
+    box-shadow: 0 0 10px #00d4ff66;
+  }
+
+  button.letter:hover:not(:disabled) {
+    background: #00a6c7;
+    box-shadow: 0 0 15px #00a6c7;
+  }
+
+  button.letter:disabled {
+    background: #555;
+    cursor: default;
+    box-shadow: none;
+  }
+
+</style>
+</head>
+<body>
+
+<div id="gameContainer">
+  <h1>⚽ Football Hangman</h1>
+  <div id="stages"></div>
+  <div id="wordDisplay"></div>
+  <div id="lives"></div>
+  <div id="message"></div>
+  <div id="letters"></div>
+</div>
+
+<div id="hint" style="margin-top:10px; font-size:1.1em; color:#00ffa6; text-shadow:0 0 5px #00ffa6;"></div>
+
+<script>
+const wordList = [
+  // General players
+  'kylian mbappe',
+  'erling haaland',
+  'bukayo saka',
+  'jamal musiala',
+  'jude bellingham',
+  'pablo gavi',
+  'pedri gonzalez',
+  'ansu fati',
+  'aurelien tchouameni',
+  'xavi simons',
+  'florian wirtz',
+  'eduardo camavinga',
+  'rayan cherki',
+  'rafael leao',
+  'alejandro balde',
+  'federico valverde',
+  'nico williams',
+  'endrick felipe',
+  'lautaro martinez',
+  'franco mastantuono',
+  'lamine yamal',
+  'cole palmer',
+  'michael olise',
+  'jarell quansah',
+  'jobe bellingham',
+  'lionel messi',
+  'cristiano ronaldo',
+  'bruno fernandes',
+  'benjamin sesko',
+  'andy robertson',
+  'neymar jr',
+  'robert lewandowski',
+  'luka modric',
+  'toni kroos',
+  'paul pogba',
+  'kevin de bruyne',
+  'virgil van dijk',
+  'mohamed salah',
+  'sadio mane',
+  'karim benzema',
+  'sergio ramos',
+  'david beckham',
+  'zinedine zidane',
+  'ronaldinho gaucho',
+  'ronaldo nazario',
+  'thierry henry',
+  'ricardo kaka',
+  'francesco totti',
+  'paolo maldini',
+  'roberto carlos',
+  'gianluigi buffon',
+  'andres iniesta',
+  'xavi hernandez',
+  'david villa',
+  'diego maradona',
+  'johan cruyff',
+
+  // Real Madrid
+  'vinicius junior',
+  'trent alexander-arnold',
+  'thibaut courtois',
+  'antonio rudiger',
+  'david alaba',
+
+  // FC Barcelona
+  'raphinha',
+  'marcus rashford',
+  'francisco trincao',
+  'joao felix',
+
+  // PSG
+  'ousmane dembele',
+  'achraf hakimi',
+  'marquinhos',
+  'vitinha',
+  'gianluigi donnarumma',
+  'marco verratti',
+
+  // Bayern Munich
+  'matthijs de ligt',
+  'alphonso davies',
+  'serge gnabry',
+  'leroy sane',
+  'joshua kimmich',
+  'dayot upamecano',
+  'thomas muller',
+  'manuel neuer',
+  'leon goretzka',
+
+  // Borussia Dortmund
+  'nico schlotterbeck',
+  'donyell malen',
+  'mats hummels',
+  'julian brandt',
+  'youssoufa mouna',
+  'emre can',
+  'sebastien haller',
+  'marco reus',
+
+  // Liverpool
+  'luis diaz',
+  'harvey elliott',
+  'alisson becker',
+  'darwin nunez',
+  'fabinho',
+  'jordan henderson',
+
+  // Manchester City
+  'phil foden',
+  'bernardo silva',
+  'ederson',
+  'rodri',
+  'ilkay gundogan',
+  'jack grealish',
+  'julian alvarez',
+  'manchester city defender',
+
+  // Manchester United
+  'casemiro',
+  'alejandro garnacho',
+  'david de gea',
+  'raphael varane',
+  'antony',
+  'harry maguire',
+  'fred',
+
+  // Arsenal
+  'martin odegaard',
+  'william saliba',
+  'declan rice',
+  'gabriel martinelli',
+  'aaron ramsdale',
+  'ben white',
+  'marquinhos arsenal',
+  'fabio vieira',
+  'kieran tierney',
+
+  // Chelsea
+  'reece james',
+  'enzo fernandez',
+  'mason mount',
+  'levi colwill',
+  'conor gallagher',
+  'kai havertz',
+  'cesar azpilicueta',
+  'marcus bettini',
+  'nicolas jackson',
+
+  // Juventus
+  'dusan vlahovic',
+  'federico chiesa',
+  'adrien rabiot',
+  'wojciech szczesny',
+  'gleison bremer',
+  'paulo dybala',
+  'fabio miretti',
+  'alejandro kaku',
+  'michy batshuayi',
+
+  // Inter Milan
+  'nicolo barella',
+  'milan skriniar',
+  'federico dimarco',
+  'yann sommer',
+  'henrikh mkhitaryan',
+  'eden hazard',
+  'alessandro bastoni',
+  'stevan jovetic',
+  'samir handanovic',
+
+  // AC Milan
+  'theo hernandez',
+  'sandro tonali',
+  'mike maignan',
+  'christian pulisic',
+  'oliver giroud',
+  'franco messias',
+  'diogo dalot',
+  'marcus therien',
+  'zaid chen'
+];
+
+const stages = [
+`  +---+
+  |   |
+  O   |
+ /|\\  |
+ / \\  |
+      |
+=========`,
+`  +---+
+  |   |
+  O   |
+ /|\\  |
+ /    |
+      |
+=========`,
+`  +---+
+  |   |
+  O   |
+ /|\\  |
+      |
+      |
+=========`,
+`  +---+
+  |   |
+  O   |
+ /|   |
+      |
+      |
+=========`,
+`  +---+
+  |   |
+  O   |
+  |   |
+      |
+      |
+=========`,
+`  +---+
+  |   |
+  O   |
+      |
+      |
+      |
+=========`,
+`  +---+
+  |   |
+      |
+      |
+      |
+      |
+=========`
+];
+
+const hints = {
+  "kylian mbappe": "French forward known for elite speed. Plays for Real Madrid.",
+  "erling haaland": "Norwegian striker and record-breaking goal scorer for Manchester City.",
+  "bukayo saka": "English winger, Arsenal’s key attacker.",
+  "jamal musiala": "German attacking midfielder for Bayern Munich, great dribbler.",
+  "jude bellingham": "English midfielder, Real Madrid superstar.",
+  "pablo gavi": "Young Spanish midfielder for Barcelona, known for intensity.",
+  "pedri gonzalez": "Spanish midfielder for Barcelona, compared to Iniesta.",
+  "ansufati": "Spanish forward, once Barcelona’s youngest goal scorer.",
+  "aurelien tchouameni": "French defensive midfielder for Real Madrid.",
+  "xavi simons": "Dutch attacking midfielder, PSG talent currently on loan.",
+  "florian wirtz": "German wonderkid midfielder for Bayer Leverkusen.",
+  "eduardo camavinga": "French midfielder for Real Madrid with great versatility.",
+  "rafael leao": "Portuguese winger, AC Milan star known for pace.",
+  "federico valverde": "Uruguayan midfielder for Real Madrid, powerful runner.",
+  "nico williams": "Spanish winger for Athletic Bilbao, very fast.",
+  "lautaro martinez": "Argentinian striker, captain of Inter Milan.",
+  "lamine yamal": "Barcelona’s young prodigy, exceptional talent at 16.",
+  "cole palmer": "English attacking midfielder for Chelsea, breakout star.",
+  "michael olise": "French winger playing for Crystal Palace, very technical.",
+  "lionel messi": "Argentinian legend, 8 Ballon d’Ors, considered greatest ever.",
+  "cristiano ronaldo": "Portuguese superstar, Real Madrid legend, goal machine.",
+  "bruno fernandes": "Portuguese midfielder and captain of Manchester United.",
+  "benjamin sesko": "Slovenian striker for RB Leipzig, highly rated prospect.",
+  "andy robertson": "Scottish left-back, key player for Liverpool.",
+  "neymar jr": "Brazilian forward known for skill and flair.",
+  "robert lewandowski": "Polish striker, Barcelona forward, former Bayern star.",
+  "luka modric": "Croatian midfielder, Ballon d’Or winner with Real Madrid.",
+  "toni kroos": "German midfielder, Real Madrid legend known for passing.",
+  "kevin de bruyne": "Belgian midfielder, Manchester City’s playmaker.",
+  "virgil van dijk": "Dutch defender, leader of Liverpool’s defense.",
+  "mohamed salah": "Egyptian winger, superstar for Liverpool.",
+  "sadio mane": "Senegalese forward, former Liverpool star.",
+  "karim benzema": "French striker, Real Madrid legend and Ballon d’Or winner.",
+  "sergio ramos": "Spanish defender known for leadership and clutch goals.",
+  "david beckham": "English legend known for free kicks and crosses.",
+  "zinedine zidane": "French legend, one of the greatest midfielders ever.",
+  "ronaldinho gaucho": "Brazilian icon, famous for skills and creativity.",
+  "ronaldo nazario": "Brazilian striker, regarded as one of the best ever.",
+  "thierry henry": "French forward, Premier League legend at Arsenal.",
+  "ricardo kaka": "Brazilian midfielder and Ballon d’Or winner.",
+  "francesco totti": "Italian forward, AS Roma legend.",
+  "paolo maldini": "Italian defender, AC Milan legend.",
+  "roberto carlos": "Brazilian left-back known for powerful shots.",
+  "gianluigi buffon": "Italian goalkeeper, Juventus legend.",
+  "andres iniesta": "Spanish midfielder, Barcelona legend and World Cup scorer.",
+  "xavi hernandez": "Spanish midfielder, Barcelona legend and current coach.",
+  "david villa": "Spanish striker, World Cup winner.",
+  "diego maradona": "Argentinian icon, one of football’s greatest ever.",
+  "johan cruyff": "Dutch legend, pioneer of Total Football.",
+  "vinicius junior": "Brazilian winger, Real Madrid star known for dribbling.",
+  "thibaut courtois": "Belgian goalkeeper for Real Madrid.",
+  "antonio rudiger": "German defender playing for Real Madrid.",
+  "raphinha": "Brazilian winger for Barcelona.",
+  "ousmane dembele": "French winger known for both-footed dribbling.",
+  "achraf hakimi": "Moroccan right-back playing for PSG.",
+  "marquinhos": "Brazilian defender and captain of PSG.",
+  "vitinha": "Portuguese midfielder for PSG.",
+  "gianluigi donnarumma": "Italian goalkeeper for PSG.",
+  "marco verratti": "Italian midfielder, longtime PSG playmaker.",
+  "matthijs de ligt": "Dutch defender for Bayern Munich.",
+  "alphonso davies": "Canadian left-back, extremely fast, plays for Bayern.",
+  "serge gnabry": "German winger for Bayern Munich.",
+  "leroy sane": "German winger, Bayern Munich star.",
+  "joshua kimmich": "German midfielder/defender for Bayern Munich.",
+  "dayot upamecano": "French defender for Bayern Munich.",
+  "thomas muller": "German forward-midfielder, Bayern legend.",
+  "manuel neuer": "German goalkeeper, Bayern & world goalkeeping icon.",
+  "leon goretzka": "German midfielder for Bayern Munich.",
+  "mats hummels": "German defender for Borussia Dortmund.",
+  "julian brandt": "German midfielder for Borussia Dortmund.",
+  "emre can": "German midfielder for Borussia Dortmund.",
+  "marco reus": "German forward, Dortmund legend.",
+  "luis diaz": "Colombian winger for Liverpool.",
+  "alisson becker": "Brazilian goalkeeper for Liverpool.",
+  "darwin nunez": "Uruguayan striker for Liverpool.",
+  "fabinho": "Brazilian defensive midfielder, former Liverpool star.",
+  "phil foden": "English midfielder/winger for Manchester City.",
+  "bernardo silva": "Portuguese midfielder for Manchester City.",
+  "ederson": "Brazilian goalkeeper for Manchester City.",
+  "rodri": "Spanish midfielder, Manchester City’s engine.",
+  "jack grealish": "English winger for Manchester City.",
+  "julian alvarez": "Argentinian forward for Manchester City.",
+  "casemiro": "Brazilian defensive midfielder formerly at Real Madrid, now at Man Utd.",
+  "alejandro garnacho": "Argentinian winger for Manchester United.",
+  "raphael varane": "French defender for Manchester United.",
+  "antony": "Brazilian winger for Manchester United.",
+  "harry maguire": "English defender for Manchester United.",
+  "martin odegaard": "Norwegian midfielder and captain of Arsenal.",
+  "william saliba": "French defender for Arsenal.",
+  "declan rice": "English midfielder, Arsenal’s record signing.",
+  "gabriel martinelli": "Brazilian winger for Arsenal.",
+  "ben white": "English defender for Arsenal.",
+  "fabio vieira": "Portuguese attacking midfielder for Arsenal.",
+  "reece james": "English right-back for Chelsea.",
+  "enzo fernandez": "Argentinian midfielder, World Cup winner, plays for Chelsea.",
+  "mason mount": "English midfielder, now at Manchester United.",
+  "levi colwill": "English defender for Chelsea.",
+  "conor gallagher": "English midfielder for Chelsea.",
+  "kai havertz": "German forward/midfielder, now at Arsenal.",
+  "dusan vlahovic": "Serbian striker for Juventus.",
+  "federico chiesa": "Italian winger for Juventus.",
+  "adrien rabiot": "French midfielder for Juventus.",
+  "wojciech szczesny": "Polish goalkeeper for Juventus.",
+  "nicolo barella": "Italian midfielder for Inter Milan.",
+  "milan skriniar": "Slovakian defender for Inter Milan.",
+  "federico dimarco": "Italian left-back for Inter Milan.",
+  "yann sommer": "Swiss goalkeeper for Inter Milan.",
+  "henrikh mkhitaryan": "Armenian midfielder for Inter Milan.",
+  "eden hazard": "Belgian winger, former Chelsea & Real Madrid star.",
+  "alessandro bastoni": "Italian defender for Inter Milan.",
+  "theo hernandez": "French left-back for AC Milan.",
+  "mike maignan": "French goalkeeper for AC Milan.",
+  "christian pulisic": "American winger for AC Milan.",
+  "olivier giroud": "French striker, World Cup winner.",
+};
+
+
+
+let chosenWord = wordList[Math.floor(Math.random() * wordList.length)];
+let chosenWord = wordList[Math.floor(Math.random() * wordList.length)];
+document.getElementById('hint').textContent = "Hint: " + hints[chosenWord];
+
+let display = chosenWord.split('').map(ch => ch === ' ' ? ' ' : '_');
+let lives = 6;
+let guessedLetters = [];
+
+const wordDisplay = document.getElementById('wordDisplay');
+const stagesDiv = document.getElementById('stages');
+const livesDiv = document.getElementById('lives');
+const messageDiv = document.getElementById('message');
+const lettersDiv = document.getElementById('letters');
+
+function updateDisplay() {
+  wordDisplay.innerHTML = '';
+  display.forEach(ch => {
+    const slot = document.createElement('span');
+    if (ch === ' ') {
+      slot.classList.add('space-slot');
+      slot.textContent = ' ';
+    } else {
+      slot.classList.add('letter-slot');
+      slot.textContent = ch;
+    }
+    wordDisplay.appendChild(slot);
+  });
+  stagesDiv.textContent = stages[lives];
+  livesDiv.textContent = `Lives: ${lives}/6`;
+}
+
+function checkLetter(letter) {
+  if (guessedLetters.includes(letter)) {
+    messageDiv.textContent = `You already guessed '${letter.toUpperCase()}'`;
+    return;
+  }
+
+  guessedLetters.push(letter);
+
+  if (chosenWord.includes(letter)) {
+    for (let i = 0; i < chosenWord.length; i++) {
+      if (chosenWord[i] === letter) display[i] = letter;
+    }
+    messageDiv.textContent = 'Good guess!';
+  } else {
+    lives--;
+    messageDiv.textContent = `Wrong guess! '${letter.toUpperCase()}' is not in the name.`;
+  }
+
+  updateDisplay();
+
+  if (!display.includes('_')) {
+    messageDiv.textContent = '🎉 YOU WIN! ⚽';
+    disableLetters();
+  } else if (lives === 0) {
+    messageDiv.textContent = `💀 YOU LOSE! The player was: ${chosenWord}`;
+    display = chosenWord.split('');
+    updateDisplay();
+    disableLetters();
+  }
+}
+
+function disableLetters() {
+  document.querySelectorAll('button.letter').forEach(btn => btn.disabled = true);
+}
+
+function createLetterButtons() {
+  const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+  alphabet.split('').forEach(letter => {
+    const btn = document.createElement('button');
+    btn.textContent = letter;
+    btn.classList.add('letter');
+    btn.onclick = () => checkLetter(letter);
+    lettersDiv.appendChild(btn);
+  });
+}
+
+createLetterButtons();
+updateDisplay();
+</script>
+
+</body>
+</html>
+
+
