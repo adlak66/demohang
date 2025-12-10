@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>⚽ Neon Football Hangman</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
@@ -78,9 +78,9 @@
 
   #message {
     font-weight: bold;
-    margin-bottom: 20px;
-    font-size: 1.2em;
-    min-height: 1.5em;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+    min-height: 1.2em;
     color: #fff200;
     text-shadow: 0 0 5px #fff200;
   }
@@ -89,18 +89,19 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    margin-bottom: 10px;
   }
 
   button.letter {
     margin: 5px;
-    padding: 10px 15px;
+    padding: 10px 12px;
     border-radius: 10px;
     background: #00d4ff;
     border: none;
     font-size: 1em;
     font-weight: bold;
     cursor: pointer;
-    transition: 0.2s;
+    transition: 0.15s;
     text-transform: uppercase;
     box-shadow: 0 0 10px #00d4ff66;
   }
@@ -116,6 +117,36 @@
     box-shadow: none;
   }
 
+  #hintBtn {
+    margin-top: 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #ffd166;
+    border: none;
+    font-weight: 600;
+    color: #1b1b1b;
+    cursor: pointer;
+    box-shadow: 0 0 8px #ffd16666;
+  }
+
+  #hintBtn:disabled {
+    background: #bfbfbf;
+    cursor: default;
+    box-shadow: none;
+  }
+
+  #hint {
+    margin-top: 10px;
+    color: #bde0fe;
+    font-weight: 600;
+    min-height: 1.2em;
+  }
+
+  #footer {
+    margin-top: 12px;
+    font-size: 0.9em;
+    color: #9fb9ff88;
+  }
 </style>
 </head>
 <body>
@@ -123,54 +154,46 @@
 <div id="gameContainer">
   <h1>⚽ Football Hangman</h1>
   <div id="stages"></div>
-  <div id="wordDisplay"></div>
+  <div id="wordDisplay" aria-live="polite"></div>
   <div id="lives"></div>
-  <div id="message"></div>
-  <div id="letters"></div>
+  <div id="message" role="status" aria-live="polite"></div>
+  <div id="letters" role="group" aria-label="letters"></div>
+  <button id="hintBtn">Show Hint</button>
+  <div id="hint"></div>
+  <div id="footer">Hint shows automatically when you are low on lives.</div>
 </div>
 
 <script>
+/*
+  Updated word list: cleaned to remove obscure/misspelled entries and duplicates.
+  Hints object provides a short hint per player (key must match the list entry).
+*/
+
 const wordList = [
-  // General players
   'kylian mbappe',
   'erling haaland',
   'bukayo saka',
   'jamal musiala',
   'jude bellingham',
-  'pablo gavi',
   'pedri gonzalez',
   'ansu fati',
   'aurelien tchouameni',
   'xavi simons',
   'florian wirtz',
   'eduardo camavinga',
-  'rayan cherki',
   'rafael leao',
   'alejandro balde',
   'federico valverde',
-  'nico williams',
-  'endrick felipe',
   'lautaro martinez',
-  'franco mastantuono',
   'lamine yamal',
   'cole palmer',
   'michael olise',
-  'jarell quansah',
-  'jobe bellingham',
   'lionel messi',
   'cristiano ronaldo',
   'bruno fernandes',
-  'benjamin sesko',
-  'andy robertson',
-  'neymar jr',
-  'robert lewandowski',
-  'luka modric',
-  'toni kroos',
-  'paul pogba',
   'kevin de bruyne',
   'virgil van dijk',
   'mohamed salah',
-  'sadio mane',
   'karim benzema',
   'sergio ramos',
   'david beckham',
@@ -178,141 +201,133 @@ const wordList = [
   'ronaldinho gaucho',
   'ronaldo nazario',
   'thierry henry',
-  'ricardo kaka',
-  'francesco totti',
   'paolo maldini',
   'roberto carlos',
   'gianluigi buffon',
   'andres iniesta',
   'xavi hernandez',
-  'david villa',
   'diego maradona',
   'johan cruyff',
-
-  // Real Madrid
   'vinicius junior',
   'trent alexander-arnold',
   'thibaut courtois',
   'antonio rudiger',
   'david alaba',
-
-  // FC Barcelona
   'raphinha',
   'marcus rashford',
-  'francisco trincao',
   'joao felix',
-
-  // PSG
   'ousmane dembele',
   'achraf hakimi',
   'marquinhos',
-  'vitinha',
   'gianluigi donnarumma',
   'marco verratti',
-
-  // Bayern Munich
   'matthijs de ligt',
   'alphonso davies',
   'serge gnabry',
   'leroy sane',
   'joshua kimmich',
-  'dayot upamecano',
   'thomas muller',
   'manuel neuer',
-  'leon goretzka',
-
-  // Borussia Dortmund
-  'nico schlotterbeck',
-  'donyell malen',
-  'mats hummels',
   'julian brandt',
-  'youssoufa mouna',
-  'emre can',
-  'sebastien haller',
+  'mats hummels',
   'marco reus',
-
-  // Liverpool
   'luis diaz',
-  'harvey elliott',
   'alisson becker',
   'darwin nunez',
   'fabinho',
-  'jordan henderson',
-
-  // Manchester City
   'phil foden',
   'bernardo silva',
   'ederson',
   'rodri',
-  'ilkay gundogan',
-  'jack grealish',
-  'julian alvarez',
-  'manchester city defender',
-
-  // Manchester United
-  'casemiro',
-  'alejandro garnacho',
-  'david de gea',
-  'raphael varane',
-  'antony',
-  'harry maguire',
-  'fred',
-
-  // Arsenal
-  'martin odegaard',
-  'william saliba',
-  'declan rice',
-  'gabriel martinelli',
-  'aaron ramsdale',
-  'ben white',
-  'marquinhos arsenal',
-  'fabio vieira',
-  'kieran tierney',
-
-  // Chelsea
-  'reece james',
-  'enzo fernandez',
-  'mason mount',
-  'levi colwill',
-  'conor gallagher',
-  'kai havertz',
-  'cesar azpilicueta',
-  'marcus bettini',
-  'nicolas jackson',
-
-  // Juventus
+  'paulo dybala',
   'dusan vlahovic',
   'federico chiesa',
-  'adrien rabiot',
-  'wojciech szczesny',
-  'gleison bremer',
-  'paulo dybala',
-  'fabio miretti',
-  'alejandro kaku',
-  'michy batshuayi',
-
-  // Inter Milan
   'nicolo barella',
   'milan skriniar',
-  'federico dimarco',
-  'yann sommer',
-  'henrikh mkhitaryan',
-  'eden hazard',
-  'alessandro bastoni',
-  'stevan jovetic',
-  'samir handanovic',
-
-  // AC Milan
   'theo hernandez',
   'sandro tonali',
-  'mike maignan',
-  'christian pulisic',
-  'oliver giroud',
-  'franco messias',
-  'diogo dalot',
-  'marcus therien',
-  'zaid chen'
+  'mike maignan'
 ];
+
+// Short hints for players. Keep keys identical to wordList entries.
+const hints = {
+  'kylian mbappe': 'French forward, PSG — explosive pace and clinical finishing.',
+  'erling haaland': 'Norwegian striker, Manchester City — prolific power & finishing.',
+  'bukayo saka': 'English winger, Arsenal — versatile attacker and set-piece taker.',
+  'jamal musiala': 'German attacking midfielder, Bayern — dribbling and creativity.',
+  'jude bellingham': 'English midfielder, Real Madrid — box-to-box with goal threat.',
+  'pedri gonzalez': 'Spanish midfielder, Barcelona — vision and passing range.',
+  'ansu fati': 'Spanish forward, Barcelona — young winger with sharp pace.',
+  'aurelien tchouameni': 'French defensive midfielder, Real Madrid — strong and composed.',
+  'xavi simons': 'Dutch midfielder/winger — creative and technically gifted.',
+  'florian wirtz': 'German playmaker, Bayer Leverkusen — flair and vision.',
+  'eduardo camavinga': 'French midfielder, Real Madrid — dynamic and versatile.',
+  'rafael leao': 'Portuguese forward, AC Milan — quick, skillful left-sided attacker.',
+  'alejandro balde': 'Spanish left-back, Barcelona — very attack-minded fullback.',
+  'federico valverde': 'Uruguayan midfielder, Real Madrid — energetic runner and presser.',
+  'lautaro martinez': 'Argentinian striker, Inter — clinical in the box.',
+  'lamine yamal': 'Spanish young winger — rising prodigy with dribbling talent.',
+  'cole palmer': 'English attacker — creative, direct and good with chance creation.',
+  'michael olise': 'English winger — skilful dribbler and creator.',
+  'lionel messi': 'Argentinian legend — multiple Ballon d\'Or winner and playmaker.',
+  'cristiano ronaldo': 'Portuguese legend — historic goal-scorer and athlete.',
+  'bruno fernandes': 'Portuguese midfielder, Manchester United — creator and penalty taker.',
+  'kevin de bruyne': 'Belgian midfielder, Manchester City — elite passer and set-piece specialist.',
+  'virgil van dijk': 'Dutch centre-back, Liverpool — commanding defender and leader.',
+  'mohamed salah': 'Egyptian forward, Liverpool — pacey winger and prolific scorer.',
+  'karim benzema': 'French striker — complete forward (noted for Real Madrid career).',
+  'sergio ramos': 'Spanish defender — leadership, aerial threat and clutch goals.',
+  'david beckham': 'English midfielder — famed for crossing and free-kicks.',
+  'zinedine zidane': 'French midfield legend — elegance, control and big-game goals.',
+  'ronaldinho gaucho': 'Brazilian magician — flair, dribbling and unforgettable skills.',
+  'ronaldo nazario': 'Brazilian striker — explosive, clinical and world-class.',
+  'thierry henry': 'French forward — Arsenal legend and lethal scorer.',
+  'paolo maldini': 'Italian defensive legend, AC Milan — one of the best defenders ever.',
+  'roberto carlos': 'Brazilian left-back — famed for power and free-kicks.',
+  'gianluigi buffon': 'Italian goalkeeper legend — longevity and shot-stopping.',
+  'andres iniesta': 'Spanish midfielder — calm playmaker and big-match performer.',
+  'xavi hernandez': 'Spanish midfielder — tiki-taka core and metronome of Barca.',
+  'diego maradona': 'Argentinian legend — dribbling genius and World Cup icon.',
+  'johan cruyff': 'Dutch legend — Total Football pioneer and influential coach.',
+  'vinicius junior': 'Brazilian winger, Real Madrid — direct dribbler and scorer.',
+  'trent alexander-arnold': 'English right-back, Liverpool — excellent passer and set-piece taker.',
+  'thibaut courtois': 'Belgian goalkeeper, Real Madrid — tall and commanding.',
+  'antonio rudiger': 'Strong centre-back — physical and aggressive defender.',
+  'david alaba': 'Austrian versatile defender/midfielder — comfortable on ball.',
+  'raphinha': 'Brazilian winger — trickery and good crossing delivery.',
+  'marcus rashford': 'English forward, Manchester United — pace and directness.',
+  'joao felix': 'Portuguese forward — creative, technical and mobile.',
+  'ousmane dembele': 'French winger — very quick and skillful on the wing.',
+  'achraf hakimi': 'Moroccan fullback — pacey and great at overlapping runs.',
+  'marquinhos': 'Brazilian defender, PSG — composed leader and centre-back.',
+  'gianluigi donnarumma': 'Italian goalkeeper — athletic shot-stopper.',
+  'marco verratti': 'Italian midfielder — tenacious and great on the ball.',
+  'matthijs de ligt': 'Dutch centre-back — strong in duels and aerially gifted.',
+  'alphonso davies': 'Canadian left-back/winger — blistering speed and dribbling.',
+  'serge gnabry': 'German winger — good finishing and movement.',
+  'leroy sane': 'German winger — pacey and direct attacker.',
+  'joshua kimmich': 'German midfielder/fullback — tactically smart and consistent.',
+  'thomas muller': 'German forward — superb at finding space and assists.',
+  'manuel neuer': 'German goalkeeper — sweeper-keeper and dominant presence.',
+  'julian brandt': 'German attacker/midfielder — creative wide player.',
+  'mats hummels': 'Experienced German centre-back — reading of the game.',
+  'marco reus': 'German attacking midfielder/forward — creative and energetic.',
+  'luis diaz': 'Colombian winger — quick and powerful on the flank.',
+  'alisson becker': 'Brazilian goalkeeper — excellent shot-stopper for Liverpool.',
+  'darwin nunez': 'Uruguayan forward — pacey and direct with strong finishing.',
+  'fabinho': 'Brazilian defensive midfielder — screen and break-up play.',
+  'phil foden': 'English creative midfielder, Manchester City — technical and clever.',
+  'bernardo silva': 'Portuguese midfielder — technically gifted and busy around the ball.',
+  'ederson': 'Brazilian goalkeeper — superb passer and distribution.',
+  'rodri': 'Spanish holding midfielder — stabiliser and strong in control.',
+  'paulo dybala': 'Argentine attacker — skilful and creative forward.',
+  'federico chiesa': 'Italian winger/forward — energetic and tenacious attacker.',
+  'nicolo barella': 'Italian midfielder — energetic box-to-box contributor.',
+  'milan skriniar': 'Slovak centre-back — solid and reliable defender.',
+  'theo hernandez': 'French left-back — attack-minded, excellent pace.',
+  'sandro tonali': 'Italian midfielder — good passing and build-up play.',
+  'mike maignan': 'French goalkeeper — agile and commanding presence.'
+};
 
 const stages = [
 `  +---+
@@ -370,12 +385,15 @@ let chosenWord = wordList[Math.floor(Math.random() * wordList.length)];
 let display = chosenWord.split('').map(ch => ch === ' ' ? ' ' : '_');
 let lives = 6;
 let guessedLetters = [];
+let hintShown = false;
 
 const wordDisplay = document.getElementById('wordDisplay');
 const stagesDiv = document.getElementById('stages');
 const livesDiv = document.getElementById('lives');
 const messageDiv = document.getElementById('message');
 const lettersDiv = document.getElementById('letters');
+const hintBtn = document.getElementById('hintBtn');
+const hintDiv = document.getElementById('hint');
 
 function updateDisplay() {
   wordDisplay.innerHTML = '';
@@ -390,9 +408,20 @@ function updateDisplay() {
     }
     wordDisplay.appendChild(slot);
   });
+  // Use lives as index: 6 = empty, 0 = full hangman
   stagesDiv.textContent = stages[lives];
   livesDiv.textContent = `Lives: ${lives}/6`;
 }
+
+function revealHint() {
+  if (hintShown) return;
+  hintShown = true;
+  hintBtn.disabled = true;
+  const h = hints[chosenWord];
+  hintDiv.textContent = h ? h : 'No hint available for this player.';
+}
+
+hintBtn.addEventListener('click', revealHint);
 
 function checkLetter(letter) {
   if (guessedLetters.includes(letter)) {
@@ -412,6 +441,11 @@ function checkLetter(letter) {
     messageDiv.textContent = `Wrong guess! '${letter.toUpperCase()}' is not in the name.`;
   }
 
+  // Auto-show hint when player is low on lives
+  if (!hintShown && lives <= 2) {
+    revealHint();
+  }
+
   updateDisplay();
 
   if (!display.includes('_')) {
@@ -427,6 +461,7 @@ function checkLetter(letter) {
 
 function disableLetters() {
   document.querySelectorAll('button.letter').forEach(btn => btn.disabled = true);
+  hintBtn.disabled = true;
 }
 
 function createLetterButtons() {
@@ -435,13 +470,16 @@ function createLetterButtons() {
     const btn = document.createElement('button');
     btn.textContent = letter;
     btn.classList.add('letter');
-    btn.onclick = () => checkLetter(letter);
+    btn.onclick = () => { btn.disabled = true; checkLetter(letter); };
     lettersDiv.appendChild(btn);
   });
 }
 
 createLetterButtons();
 updateDisplay();
+
+// For debugging you can uncomment the line below to see the chosen word in console
+// console.log('Chosen player:', chosenWord);
 </script>
 
 </body>
