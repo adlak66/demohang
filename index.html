@@ -548,28 +548,6 @@ createLetterButtons();
 initGame();
 
 
-<button onclick="requestLocation()">Enable Location</button>
-
-
-function requestLocation() {
-  if (!navigator.geolocation) {
-    alert("Geolocation is not supported by this browser.");
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(
-    (position) => {
-      console.log("Latitude:", position.coords.latitude);
-      console.log("Longitude:", position.coords.longitude);
-    },
-    (error) => {
-      console.error("Location error:", error.message);
-    }
-  );
-}
-
-
-
 // For debugging you can uncomment the line below to see the chosen word in console
 // console.log('Chosen player:', chosenWord);
 </script>
